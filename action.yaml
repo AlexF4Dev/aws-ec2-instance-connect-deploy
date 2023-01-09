@@ -26,8 +26,14 @@ inputs:
   user-name:
     description: "The user name"
     required: true
-
-
+  rsync-args:
+    description: 'rsync args'
+    required: true
+    default: "--stats --progress"        
+  mssh-path:
+    description: 'Path to mssh'
+    required: true
+    default: "/home/ubuntu/.local/bin/mssh"        
 outputs:
   result:
     description: "Output of the command"
@@ -41,8 +47,9 @@ runs:
       run: |
         AWS_ACCESS_KEY_ID=${{ inputs.access-key-id }} \
         AWS_SECRET_ACCESS_KEY=${{ inputs.secret-access-key }} \
-        AWS_DEFAULT_REGION=${{ inputs.default-region }} \
-        rsync -a --stats --progress -e "/home/ubuntu/.local/bin/mssh -r ${AWS_DEFAULT_REGION}" ${{ inputs.local-path }} "${{ inputs.user-name }}@${{ inputs.instance-id }}:${{ inputs.remote-path }}" > action_output
+        AWS_DEFAULT_REGION=${{ inputs.default-region }}
+        
+        rsync -a ${{ inputs.rsync-args }} -e "${{ inputs.mssh-path }} -r ${AWS_DEFAULT_REGION}" ${{ inputs.local-path }} "${{ inputs.user-name }}@${{ inputs.instance-id }}:${{ inputs.remote-path }}" > action_output
         
         tr  '\n' '--'  < action_output > single_lined_output
      
