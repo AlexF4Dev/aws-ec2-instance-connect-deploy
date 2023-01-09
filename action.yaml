@@ -42,24 +42,11 @@ runs:
         AWS_ACCESS_KEY_ID=${{ inputs.access-key-id }} \
         AWS_SECRET_ACCESS_KEY=${{ inputs.secret-access-key }} \
         AWS_DEFAULT_REGION=${{ inputs.default-region }} \
-        SRC=${{ inputs.local-path }} \
-        DEST=${{ inputs.remote-path }} \
-        INSTANCE_ID=${{ inputs.instance-id }} \
-        USER_NAME=${{ inputs.user-name }} \
-        rsync -a --stats --progress -e "/home/ubuntu/.local/bin/mssh -r ${AWS_DEFAULT_REGION}" ${SRC} "${USER_NAME}@INSTANCE_ID:/home/ubuntu" > action_output
-        
-        
-        #rsync -a --stats --progress -e "  /home/ubuntu/.local/bin/mssh  -r us-east-1" /home/ubuntu/actions-runner/_work/ec2-ubunty-github-runner/ec2-ubunty-github-runner/auth  ubuntu@i-01dabdd57efae128b:/home/ubuntu > action_output
-        
-
-        #
-
+        rsync -a --stats --progress -e "/home/ubuntu/.local/bin/mssh -r ${AWS_DEFAULT_REGION}" ${{ inputs.local-path }} "${{ inputs.user-name }}@${{ inputs.instance-id }}:${{ inputs.remote-path }}" > action_output
         
         tr  '\n' '--'  < action_output > single_lined_output
-        
-
+     
         content=`cat single_lined_output`
-        echo $content
         echo "result=$(cat single_lined_output)" >> $GITHUB_OUTPUT
 
         rm action_output
